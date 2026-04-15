@@ -1,0 +1,44 @@
+---
+- hosts: all
+  become: no
+  become_method: sudo
+
+  tasks:
+    - name: install python package
+      become: yes
+      package:
+        name:
+          - python3-apt
+          - apache2
+        state: latest
+
+    - name: copy conf file
+      become: yes
+      copy:
+        src: files/config/apache.conf
+        dest: /etc/apache2/apache2.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: copy index file
+      become: yes
+      copy:
+        src: files/site/index.html
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: 0644
+
+    - name: link
+      become: yes
+      file:
+        src: /etc/apache2/sites-available/000-default.conf
+        dest: /etc/apache2/sites-enabled/000-default.conf
+        state: link
+
+    - name: restart apache
+      become: yes
+      service:
+        name: apache2
+        state: restarted
