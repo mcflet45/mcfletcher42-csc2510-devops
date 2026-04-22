@@ -1,17 +1,10 @@
 ---
 - hosts: all
-  become: no
+  become: yes
   become_method: sudo
-
+  roles:
+    - { role: geerlingguy.apache }
   tasks:
-    - name: install python package
-      become: yes
-      package:
-        name:
-          - python3-apt
-          - apache2
-        state: latest
-
     - name: copy conf file
       become: yes
       copy:
@@ -29,16 +22,3 @@
         owner: www-data
         group: www-data
         mode: 0644
-
-    - name: link
-      become: yes
-      file:
-        src: /etc/apache2/sites-available/000-default.conf
-        dest: /etc/apache2/sites-enabled/000-default.conf
-        state: link
-
-    - name: restart apache
-      become: yes
-      service:
-        name: apache2
-        state: restarted
